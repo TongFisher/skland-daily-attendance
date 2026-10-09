@@ -2,7 +2,10 @@ name: attendance
 
 on:
   schedule:
-    - cron: '0 16 * * *'
+    # UTC 22:37 = 北京时间次日 06:37
+    # 1) 避开 GitHub Actions 整点排队高峰（整点任务常延迟 15~40 分钟）
+    # 2) 已过游戏中午夜与凌晨 4 点两个日切点，签到归属当天不会有歧义
+    - cron: '37 22 * * *'
   workflow_dispatch:
   workflow_call:
     secrets:
@@ -17,7 +20,7 @@ on:
     inputs:
       repository:
         description: The repository to run the workflow on
-        default: enpitsuLin/skland-daily-attendance
+        default: TongFisher/skland-daily-attendance
         required: false
         type: string
 

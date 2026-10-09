@@ -3,8 +3,32 @@ export * from './format'
 export * from './message'
 export * from './retry'
 
-export function getSplitByComma(value: string) {
-  return value ? value.split(',') : []
+/**
+ * 按逗号分割配置项（环境变量 / secret）。
+ *
+ * 会额外做清洗：
+ * - 去掉首尾空白、换行、制表符（GitHub Secret 常因粘贴带入 `\n`）
+ * - 去掉包裹的成对引号（从 JSON 里复制 `content` 字段时容易带上）
+ * - 过滤空串
+ */
+export function getSplitByComma(value: string): string[] {
+  if (!value)
+    return []
+
+  return value
+    .split(',')
+    .map((item) => {
+      let v = item.trim()
+      // 去掉成对包裹的引号，例如 `abc"` 或 'abc'
+      if (v.length >= 2) {
+        const first = v[0]
+        const last = v[v.length - 1]
+        if ((first === '"' || first === '\'') && first === last)
+          v = v.slice(1, -1).trim()
+      }
+      return v
+    })
+    .filter(Boolean)
 }
 
 /**
